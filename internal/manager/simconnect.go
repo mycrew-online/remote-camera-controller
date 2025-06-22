@@ -11,17 +11,9 @@ import (
 
 const DLL_DEFAULT_PATH = "C:/MSFS 2024 SDK/SimConnect SDK/lib/SimConnect.dll"
 
-// ConnectionState represents the state of the SimConnect connection.
-type ConnectionState int
-
-const (
-	Offline ConnectionState = iota
-	Connecting
-	Online
-)
-
 // SimConnectManager handles the connection to the simulator.
 type SimConnectManager struct {
+	system  *SimulatorState
 	state   ConnectionState
 	stateMu sync.RWMutex
 	stopCh  chan struct{}
@@ -33,11 +25,12 @@ type SimConnectManager struct {
 // NewSimConnectManager creates a new SimConnectManager in Offline state.
 func NewSimConnectManager() *SimConnectManager {
 	return &SimConnectManager{
-		client: client.NewWithDLL("NAME", DLL_DEFAULT_PATH),
+		client: client.NewWithDLL("[MyCrew.online] - RCC", DLL_DEFAULT_PATH),
 		logger: logger.NewLogger(logger.LogOptions{
 			Level: logger.Info,
 		}),
-		state: Offline,
+		system: &SimulatorState{},
+		state:  Offline,
 	}
 }
 
@@ -78,6 +71,10 @@ func (m *SimConnectManager) IsOnline() bool {
 // Client returns the underlying SimConnect client.
 func (m *SimConnectManager) Client() *client.Engine {
 	return m.client
+}
+
+func (m *SimConnectManager) Stream() <-chan client.ParsedMessage {
+	return m.client.Stream()
 }
 
 // Logger returns the logger used by the SimConnectManager.

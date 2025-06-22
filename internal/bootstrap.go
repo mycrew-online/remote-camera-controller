@@ -20,7 +20,7 @@ func Bootstrap() *manager.SimConnectManager {
 
 	// Start event handler goroutine for disconnects
 	go func() {
-		for event := range mgr.Client().Stream() {
+		for event := range mgr.Stream() {
 			log.Info(fmt.Sprintf("[SimConnectManager] Received event: %v", event.MessageType))
 			// we should not process messages while there is no connection
 			if !mgr.IsOnline() {
@@ -54,6 +54,6 @@ func Bootstrap() *manager.SimConnectManager {
 	log.Info("[SimConnectManager] Shutdown signal received. Stopping connection...")
 	mgr.StopConnection()
 	mgr.Disconnect()
-	log.Info("[SimConnectManager] stopped and disconnected.")
+	log.Info("[SimConnectManager] Stopped and disconnected.")
 	return mgr
 }
