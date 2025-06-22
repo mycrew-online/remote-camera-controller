@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -19,6 +20,16 @@ func Bootstrap() *manager.SimConnectManager {
 	// Start event handler goroutine for disconnects
 	go func() {
 		for event := range mgr.Client().Stream() {
+			fmt.Println("[SimConnectManager] Received event:", event)
+			// we should not process messages while there is no connection
+			if !mgr.IsOnline() {
+				return
+			}
+
+			if event.MessageType == types.SIMCONNECT_RECV_ID_OPEN {
+				fmt.Println("[SimConnectManager] Simulator loaded successfully.")
+			}
+
 			if event.MessageType == types.SIMCONNECT_RECV_ID_QUIT {
 				fmt.Println("[SimConnectManager] Simulator disconnected, switching to Offline.")
 				mgr.SetOffline()
@@ -26,9 +37,18 @@ func Bootstrap() *manager.SimConnectManager {
 		}
 	}()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	<-sigs
+	go func() {
+		sig := <-sigs
+		fmt.Printf("Received signal: %v\n", sig)
+		cancel()
+	}()
+
+	<-ctx.Done()
 
 	fmt.Println("Shutdown signal received. Stopping connection...")
 	mgr.StopConnection()
