@@ -12,11 +12,12 @@ import (
 )
 
 // Bootstrap initializes the SimConnectManager, starts the connection loop, launches event handler, and handles graceful shutdown.
-func Bootstrap() *manager.SimConnectManager {
+func (app *Application) Bootstrap() *manager.SimConnectManager {
 	mgr := manager.NewSimConnectManager()
 	log := mgr.Logger()
+
+	log.Info("[SimConnectManager] App started. Waiting for shutdown signal (Ctrl+C)...")
 	mgr.StartConnection()
-	log.Info("[SimConnectManager] started. Waiting for shutdown signal (Ctrl+C)...")
 
 	// Start event handler goroutine for disconnects
 	go func() {
@@ -53,7 +54,6 @@ func Bootstrap() *manager.SimConnectManager {
 
 	log.Info("[SimConnectManager] Shutdown signal received. Stopping connection...")
 	mgr.StopConnection()
-	mgr.Disconnect()
 	log.Info("[SimConnectManager] Stopped and disconnected.")
 	return mgr
 }
