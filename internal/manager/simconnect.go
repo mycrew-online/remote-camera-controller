@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mrlm-net/go-logz/pkg/logger"
 	"github.com/mrlm-net/simconnect/pkg/client"
 )
 
@@ -25,6 +26,7 @@ type SimConnectManager struct {
 	stateMu sync.RWMutex
 	stopCh  chan struct{}
 	stopped sync.WaitGroup
+	logger  *logger.Logger
 	client  *client.Engine
 }
 
@@ -32,35 +34,38 @@ type SimConnectManager struct {
 func NewSimConnectManager() *SimConnectManager {
 	return &SimConnectManager{
 		client: client.NewWithDLL("NAME", DLL_DEFAULT_PATH),
-		state:  Offline,
+		logger: logger.NewLogger(logger.LogOptions{
+			Level: logger.Info,
+		}),
+		state: Offline,
 	}
 }
 
 // Connect attempts to establish a connection to the simulator.
 func (m *SimConnectManager) Connect() {
-	fmt.Println("[SimConnectManager] Attempting to connect...")
+	m.logger.Info("[SimConnectManager] Attempting to connect...")
 	err := m.client.Connect()
 	m.stateMu.Lock()
 	defer m.stateMu.Unlock()
 	if err != nil {
-		fmt.Printf("[SimConnectManager] Connection failed: %v\n", err)
+		m.logger.Debug(fmt.Sprintf("[SimConnectManager] Connection failed: %v", err))
 		m.state = Offline
 		return
 	}
-	fmt.Println("[SimConnectManager] Connected successfully.")
+	m.logger.Info("[SimConnectManager] Connected successfully.")
 	m.state = Online
 }
 
 // Disconnect closes the connection to the simulator.
 func (m *SimConnectManager) Disconnect() {
-	fmt.Println("[SimConnectManager] Disconnecting...")
+	m.logger.Info("[SimConnectManager] Disconnecting...")
 	if m.client != nil {
 		_ = m.client.Disconnect() // ignore error for now
 	}
 	m.stateMu.Lock()
 	m.state = Offline
 	m.stateMu.Unlock()
-	fmt.Println("[SimConnectManager] Disconnected.")
+	m.logger.Info("[SimConnectManager] Disconnected.")
 }
 
 // IsOnline returns true if the connection is established.
@@ -73,6 +78,11 @@ func (m *SimConnectManager) IsOnline() bool {
 // Client returns the underlying SimConnect client.
 func (m *SimConnectManager) Client() *client.Engine {
 	return m.client
+}
+
+// Logger returns the logger used by the SimConnectManager.
+func (m *SimConnectManager) Logger() *logger.Logger {
+	return m.logger
 }
 
 // SetOffline sets the manager state to Offline in a thread-safe way.
@@ -92,12 +102,12 @@ func (m *SimConnectManager) StartConnection() {
 		for {
 			select {
 			case <-m.stopCh:
-				fmt.Println("[SimConnectManager] Connection loop stopped.")
+				m.logger.Info("[SimConnectManager] Connection loop stopped.")
 				return
 			default:
 				m.stateMu.Lock()
 				if m.state == Offline {
-					fmt.Println("[SimConnectManager] State is Offline, will try to connect.")
+					m.logger.Debug("[SimConnectManager] State is Offline, will try to connect.")
 					m.state = Connecting
 					m.stateMu.Unlock()
 					m.Connect() // Use real connection logic
