@@ -7,6 +7,10 @@ import (
 
 // HandleOpen processes SIMCONNECT_RECV_ID_OPEN events.
 func HandleOpen(log *logger.Logger, mgr *manager.SimConnectManager) {
+	if mgr == nil || mgr.Client() == nil {
+		log.Error("[SimConnectManager] SimConnectManager or Client is nil. Cannot process SIMCONNECT_RECV_ID_OPEN event.")
+		return
+	}
 	log.Info("[SimConnectManager] Simulator loaded successfully.")
 	mgr.Client().RequestSystemState(1, "AircraftLoaded")
 	mgr.Client().RequestSystemState(2, "DialogMode")
