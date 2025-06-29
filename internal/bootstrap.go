@@ -13,7 +13,7 @@ import (
 
 // Bootstrap initializes the SimConnectManager, starts the connection loop, launches event handler, and handles graceful shutdown.
 func (app *Application) Bootstrap() *manager.SimConnectManager {
-	mgr := manager.NewSimConnectManager()
+	mgr := app.SimConnectManager
 	log := mgr.Logger()
 
 	log.Info("[SimConnectManager] App started. Waiting for shutdown signal (Ctrl+C)...")
@@ -30,8 +30,18 @@ func (app *Application) Bootstrap() *manager.SimConnectManager {
 
 			if event.MessageType == types.SIMCONNECT_RECV_ID_OPEN {
 				log.Info("[SimConnectManager] Simulator loaded successfully.")
+				// Request system states after connection is established
+				mgr.Client().RequestSystemState(1, "AircraftLoaded")
+				mgr.Client().RequestSystemState(2, "DialogMode")
+				mgr.Client().RequestSystemState(3, "FlightLoaded")
+				mgr.Client().RequestSystemState(4, "FlightPlan")
+				mgr.Client().RequestSystemState(5, "Sim")
 			}
 
+			// Log all system state messages for inspection
+			if event.MessageType == types.SIMCONNECT_RECV_ID_SYSTEM_STATE {
+				log.Info(fmt.Sprintf("[SimConnectManager] Received system state: %+v", event))
+			}
 			if event.MessageType == types.SIMCONNECT_RECV_ID_QUIT {
 				log.Info("[SimConnectManager] Simulator disconnected, switching to Offline.")
 				mgr.SetOffline()

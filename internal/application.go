@@ -7,3 +7,15 @@ type Application struct {
 	SimConnectManager *manager.SimConnectManager
 	System            *SimulatorState
 }
+
+// NewApplicationWithOptions creates an Application with a log level option.
+func NewApplicationWithOptions(logLevel string) *Application {
+	return &Application{
+		SimConnectManager: manager.NewSimConnectManagerWithOptions(logLevel),
+	}
+}
+
+// NewApplication is kept for backward compatibility, defaults to info log level.
+func NewApplication() *Application {
+	return NewApplicationWithOptions("info")
+}

@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/mrlm-net/go-logz/pkg/logger"
@@ -21,15 +22,34 @@ type SimConnectManager struct {
 	client  *client.Engine
 }
 
-// NewSimConnectManager creates a new SimConnectManager in Offline state.
-func NewSimConnectManager() *SimConnectManager {
+// NewSimConnectManagerWithOptions creates a new SimConnectManager in Offline state.
+func NewSimConnectManagerWithOptions(logLevel string) *SimConnectManager {
+	level := parseLogLevel(logLevel)
+	fmt.Println("Log level set to:", level)
 	return &SimConnectManager{
 		client: client.NewWithDLL(APP_NAME, DLL_DEFAULT_PATH),
 		logger: logger.NewLogger(logger.LogOptions{
-			Level: logger.Info,
+			Level: level,
 		}),
 		//system: &SimulatorState{},
 		state: Offline,
+	}
+}
+
+// NewSimConnectManager is kept for backward compatibility, defaults to Info level.
+func NewSimConnectManager() *SimConnectManager {
+	return NewSimConnectManagerWithOptions("info")
+}
+
+// parseLogLevel converts a string to logger.LogLevel, defaults to Info.
+func parseLogLevel(level string) logger.LogLevel {
+	switch level {
+	case "debug":
+		return logger.Debug
+	case "info":
+		fallthrough
+	default:
+		return logger.Info
 	}
 }
 
