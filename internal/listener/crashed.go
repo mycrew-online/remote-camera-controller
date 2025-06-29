@@ -11,5 +11,5 @@ import (
 // HandleCrashedEvent processes Crashed system events (event ID 103) and updates state.
 func HandleCrashedEvent(log *logger.Logger, mgr *manager.SimConnectManager, event *types.SIMCONNECT_RECV_EVENT) {
 	mgr.SimulatorState().SetCrashed(int(event.DwData))
-	log.Info(fmt.Sprintf("[SimConnectManager] Crashed event received: dwData=%d", event.DwData))
+	log.Debug(fmt.Sprintf("[SimConnectManager] Crashed event received: dwData=%d", event.DwData))
 }

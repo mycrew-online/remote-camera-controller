@@ -21,20 +21,20 @@ func HandleSystemState(log *logger.Logger, mgr *manager.SimConnectManager, event
 	switch event.DwRequestID {
 	case 1:
 		mgr.SimulatorState().SetAircraftLoaded(szString)
-		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | AircraftLoaded (RequestID: %d): String: %q", event.DwRequestID, szString))
+		log.Debug(fmt.Sprintf("[SimConnectManager] SystemState Response | AircraftLoaded (RequestID: %d): String: %q", event.DwRequestID, szString))
 	case 2:
 		mgr.SimulatorState().SetDialogMode(int(event.DwInteger))
-		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | DialogMode (RequestID: %d): Integer: %d", event.DwRequestID, event.DwInteger))
+		log.Debug(fmt.Sprintf("[SimConnectManager] SystemState Response | DialogMode (RequestID: %d): Integer: %d", event.DwRequestID, event.DwInteger))
 	case 3:
 		mgr.SimulatorState().SetFlightLoaded(szString)
-		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | FlightLoaded (RequestID: %d): String: %q", event.DwRequestID, szString))
+		log.Debug(fmt.Sprintf("[SimConnectManager] SystemState Response | FlightLoaded (RequestID: %d): String: %q", event.DwRequestID, szString))
 	case 4:
 		mgr.SimulatorState().SetFlightPlan(szString)
-		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | FlightPlan (RequestID: %d): String: %q", event.DwRequestID, szString))
+		log.Debug(fmt.Sprintf("[SimConnectManager] SystemState Response | FlightPlan (RequestID: %d): String: %q", event.DwRequestID, szString))
 	case 5:
 		mgr.SimulatorState().SetSim(int(event.DwInteger))
-		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | Sim (RequestID: %d): Integer: %d", event.DwRequestID, event.DwInteger))
+		log.Debug(fmt.Sprintf("[SimConnectManager] SystemState Response | Sim (RequestID: %d): Integer: %d", event.DwRequestID, event.DwInteger))
 	default:
-		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | RequestID: %d | Integer: %d | Float (raw uint32): %d | String: %q", event.DwRequestID, event.DwInteger, event.DwFloat, szString))
+		log.Debug(fmt.Sprintf("[SimConnectManager] SystemState Response | RequestID: %d | Integer: %d | Float (raw uint32): %d | String: %q", event.DwRequestID, event.DwInteger, event.DwFloat, szString))
 	}
 }

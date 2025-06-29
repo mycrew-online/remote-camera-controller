@@ -31,5 +31,5 @@ func HandleViewEvent(log *logger.Logger, mgr *manager.SimConnectManager, event *
 		viewType = fmt.Sprintf("Unknown (%d)", event.DwData)
 	}
 	mgr.SimulatorState().SetView(int(event.DwData))
-	log.Info(fmt.Sprintf("[SimConnectManager] View event received: dwData=%d (%s)", event.DwData, viewType))
+	log.Debug(fmt.Sprintf("[SimConnectManager] View event received: dwData=%d (%s)", event.DwData, viewType))
 }

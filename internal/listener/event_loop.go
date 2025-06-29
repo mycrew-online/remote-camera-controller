@@ -12,7 +12,7 @@ import (
 func StartSimConnectEventListener(mgr *manager.SimConnectManager, log *logger.Logger) {
 	go func() {
 		for event := range mgr.Stream() {
-			log.Info(fmt.Sprintf("[SimConnectManager] Received event: %v, data type: %T", event.MessageType, event.Data))
+			log.Debug(fmt.Sprintf("[SimConnectManager] Received event: %v, data type: %T", event.MessageType, event.Data))
 			if !mgr.IsOnline() {
 				return
 			}

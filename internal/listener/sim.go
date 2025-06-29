@@ -11,5 +11,5 @@ import (
 // HandleSimEvent processes Sim system events (event ID 107) and updates state.
 func HandleSimEvent(log *logger.Logger, mgr *manager.SimConnectManager, event *types.SIMCONNECT_RECV_EVENT) {
 	mgr.SimulatorState().SetSim(int(event.DwData))
-	log.Info(fmt.Sprintf("[SimConnectManager] Sim event received: dwData=%d", event.DwData))
+	log.Debug(fmt.Sprintf("[SimConnectManager] Sim event received: dwData=%d", event.DwData))
 }

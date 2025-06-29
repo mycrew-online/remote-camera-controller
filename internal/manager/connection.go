@@ -15,7 +15,7 @@ func (m *SimConnectManager) StartConnection() {
 		for {
 			select {
 			case <-m.stopCh:
-				m.logger.Info("[SimConnectManager] Connection loop stopped.")
+				m.logger.Debug("[SimConnectManager] Connection loop stopped.")
 				return
 			default:
 				m.stateMu.Lock()
@@ -59,12 +59,12 @@ func (m *SimConnectManager) connect() {
 
 // Disconnect closes the connection to the simulator.
 func (m *SimConnectManager) disconnect() {
-	m.logger.Info("[SimConnectManager] Disconnecting...")
+	m.logger.Debug("[SimConnectManager] Disconnecting...")
 	if m.client != nil {
 		_ = m.client.Disconnect() // ignore error for now
 	}
 	m.stateMu.Lock()
 	m.state = Offline
 	m.stateMu.Unlock()
-	m.logger.Info("[SimConnectManager] Disconnected.")
+	m.logger.Debug("[SimConnectManager] Disconnected.")
 }
