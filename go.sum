@@ -2,3 +2,5 @@ github.com/mrlm-net/go-logz v0.0.0-20250528153532-f30cb89c1c84 h1:Mu6DjumhECUhob
 github.com/mrlm-net/go-logz v0.0.0-20250528153532-f30cb89c1c84/go.mod h1:xN3X5xIyDn5GsQYr65bBs0AQqjRc4o8kcfguHeMK3pc=
 github.com/mrlm-net/simconnect v0.0.0-20250622094212-b21efe88c406 h1:fTIqwQ05j20Jp04hXMj01rCtADflICLTS0jThn5aITw=
 github.com/mrlm-net/simconnect v0.0.0-20250622094212-b21efe88c406/go.mod h1:BHqeJNkgdfRkHMT6APqcQ1aAEn4Hprf4fCiWcoFWkDI=
+github.com/mrlm-net/simconnect v0.0.0-20250629072905-337a558a1b36 h1:uR59hk0ag+3gBJE5mniMk+7lHyv4+c3NO0xqAfSw4XQ=
+github.com/mrlm-net/simconnect v0.0.0-20250629072905-337a558a1b36/go.mod h1:BHqeJNkgdfRkHMT6APqcQ1aAEn4Hprf4fCiWcoFWkDI=

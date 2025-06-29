@@ -4,5 +4,5 @@ go 1.21
 
 require (
 	github.com/mrlm-net/go-logz v0.0.0-20250528153532-f30cb89c1c84
-	github.com/mrlm-net/simconnect v0.0.0-20250622094212-b21efe88c406
+	github.com/mrlm-net/simconnect v0.0.0-20250629072905-337a558a1b36
 )
