@@ -1,6 +1,8 @@
 github.com/mrlm-net/go-logz v0.0.0-20250528153532-f30cb89c1c84 h1:Mu6DjumhECUhobTx/ku9VQS6ETlGXUisLkexRSHHS3s=
 github.com/mrlm-net/go-logz v0.0.0-20250528153532-f30cb89c1c84/go.mod h1:xN3X5xIyDn5GsQYr65bBs0AQqjRc4o8kcfguHeMK3pc=
-github.com/mrlm-net/simconnect v0.0.0-20250622094212-b21efe88c406 h1:fTIqwQ05j20Jp04hXMj01rCtADflICLTS0jThn5aITw=
-github.com/mrlm-net/simconnect v0.0.0-20250622094212-b21efe88c406/go.mod h1:BHqeJNkgdfRkHMT6APqcQ1aAEn4Hprf4fCiWcoFWkDI=
-github.com/mrlm-net/simconnect v0.0.0-20250629072905-337a558a1b36 h1:uR59hk0ag+3gBJE5mniMk+7lHyv4+c3NO0xqAfSw4XQ=
-github.com/mrlm-net/simconnect v0.0.0-20250629072905-337a558a1b36/go.mod h1:BHqeJNkgdfRkHMT6APqcQ1aAEn4Hprf4fCiWcoFWkDI=
+github.com/mrlm-net/simconnect v0.0.0-20250629091558-8be228f8c2d1 h1:4fR2BVjpD2WgNuKg7+/3QJ75vDhnovKGj3aNzWcL/t4=
+github.com/mrlm-net/simconnect v0.0.0-20250629091558-8be228f8c2d1/go.mod h1:BHqeJNkgdfRkHMT6APqcQ1aAEn4Hprf4fCiWcoFWkDI=
+github.com/mrlm-net/simconnect v0.0.0-20250629094517-b3a84d255eae h1:TiT/WMv3DeY2XkxN0rDEjmHpnFc5Wlx9XGkhK3bMwRY=
+github.com/mrlm-net/simconnect v0.0.0-20250629094517-b3a84d255eae/go.mod h1:BHqeJNkgdfRkHMT6APqcQ1aAEn4Hprf4fCiWcoFWkDI=
+github.com/mrlm-net/simconnect v0.0.0-20250629095241-94f37ffbd912 h1:986iS5XuR+Ny0RXTkA7qN/EsQ9+6meGnKmmdjiNl8q4=
+github.com/mrlm-net/simconnect v0.0.0-20250629095241-94f37ffbd912/go.mod h1:BHqeJNkgdfRkHMT6APqcQ1aAEn4Hprf4fCiWcoFWkDI=
