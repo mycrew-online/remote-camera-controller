@@ -19,6 +19,9 @@ func HandleOpen(log *logger.Logger, mgr *manager.SimConnectManager) {
 	mgr.Client().SubscribeToSystemEvent(101, "AircraftLoaded")
 	mgr.Client().SubscribeToSystemEvent(102, "FlightLoaded")
 	mgr.Client().SubscribeToSystemEvent(103, "Crashed")
-
-	log.Info("[SimConnectManager] Subscribed to Pause (100), AircraftLoaded (101), FlightLoaded (102), Crashed (103) events")
+	mgr.Client().SubscribeToSystemEvent(104, "FlightPlanActivated")
+	mgr.Client().SubscribeToSystemEvent(105, "FlightPlanDeactivated")
+	mgr.Client().SubscribeToSystemEvent(106, "PositionChanged")
+	mgr.Client().SubscribeToSystemEvent(107, "Sim")
+	mgr.Client().SubscribeToSystemEvent(108, "View")
 }
