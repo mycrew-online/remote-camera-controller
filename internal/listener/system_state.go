@@ -5,10 +5,11 @@ import (
 
 	"github.com/mrlm-net/go-logz/pkg/logger"
 	"github.com/mrlm-net/simconnect/pkg/types"
+	"github.com/mycrew-online/remote-camera-controller/internal/manager"
 )
 
-// HandleSystemState processes SIMCONNECT_RECV_ID_SYSTEM_STATE events.
-func HandleSystemState(log *logger.Logger, event *types.SIMCONNECT_RECV_SYSTEM_STATE) {
+// HandleSystemState processes SIMCONNECT_RECV_ID_SYSTEM_STATE events and updates the state store.
+func HandleSystemState(log *logger.Logger, mgr *manager.SimConnectManager, event *types.SIMCONNECT_RECV_SYSTEM_STATE) {
 	szString := ""
 	for i, b := range event.SzString {
 		if b == 0 {
@@ -16,32 +17,24 @@ func HandleSystemState(log *logger.Logger, event *types.SIMCONNECT_RECV_SYSTEM_S
 			break
 		}
 	}
-	var stateName string
-	var isStringState, isIntegerState bool
+	// removed unused variables and duplicate switch
 	switch event.DwRequestID {
 	case 1:
-		stateName = "AircraftLoaded"
-		isStringState = true
+		mgr.SimulatorState().SetAircraftLoaded(szString)
+		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | AircraftLoaded (RequestID: %d): String: %q", event.DwRequestID, szString))
 	case 2:
-		stateName = "DialogMode"
-		isIntegerState = true
+		mgr.SimulatorState().SetDialogMode(int(event.DwInteger))
+		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | DialogMode (RequestID: %d): Integer: %d", event.DwRequestID, event.DwInteger))
 	case 3:
-		stateName = "FlightLoaded"
-		isStringState = true
+		mgr.SimulatorState().SetFlightLoaded(szString)
+		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | FlightLoaded (RequestID: %d): String: %q", event.DwRequestID, szString))
 	case 4:
-		stateName = "FlightPlan"
-		isStringState = true
+		mgr.SimulatorState().SetFlightPlan(szString)
+		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | FlightPlan (RequestID: %d): String: %q", event.DwRequestID, szString))
 	case 5:
-		stateName = "Sim"
-		isIntegerState = true
+		mgr.SimulatorState().SetSim(int(event.DwInteger))
+		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | Sim (RequestID: %d): Integer: %d", event.DwRequestID, event.DwInteger))
 	default:
-		stateName = "Unknown"
-	}
-	if isStringState {
-		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | %s (RequestID: %d): String: %q", stateName, event.DwRequestID, szString))
-	} else if isIntegerState {
-		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | %s (RequestID: %d): Integer: %d", stateName, event.DwRequestID, event.DwInteger))
-	} else {
 		log.Info(fmt.Sprintf("[SimConnectManager] SystemState Response | RequestID: %d | Integer: %d | Float (raw uint32): %d | String: %q", event.DwRequestID, event.DwInteger, event.DwFloat, szString))
 	}
 }

@@ -23,29 +23,29 @@ func StartSimConnectEventListener(mgr *manager.SimConnectManager, log *logger.Lo
 
 			case types.SIMCONNECT_RECV_ID_SYSTEM_STATE:
 				if ev, ok := event.Data.(*types.SIMCONNECT_RECV_SYSTEM_STATE); ok {
-					HandleSystemState(log, ev)
+					HandleSystemState(log, mgr, ev)
 				}
 			case types.SIMCONNECT_RECV_ID_EVENT:
 				if ev, ok := event.Data.(*types.SIMCONNECT_RECV_EVENT); ok {
 					switch ev.UEventID {
 					case 100:
-						HandlePauseEvent(log, ev)
+						HandlePauseEvent(log, mgr, ev)
 					case 101:
-						HandleAircraftLoadedEvent(log, ev)
+						HandleAircraftLoadedEvent(log, mgr, ev)
 					case 102:
-						HandleFlightLoadedEvent(log, ev)
+						HandleFlightLoadedEvent(log, mgr, ev)
 					case 103:
-						HandleCrashedEvent(log, ev)
+						HandleCrashedEvent(log, mgr, ev)
 					case 104:
-						HandleFlightPlanActivatedEvent(log, ev)
+						HandleFlightPlanActivatedEvent(log, mgr, ev)
 					case 105:
-						HandleFlightPlanDeactivatedEvent(log, ev)
+						HandleFlightPlanDeactivatedEvent(log, mgr, ev)
 					case 106:
-						HandlePositionChangedEvent(log, ev)
+						HandlePositionChangedEvent(log, mgr, ev)
 					case 107:
-						HandleSimEvent(log, ev)
+						HandleSimEvent(log, mgr, ev)
 					case 108:
-						HandleViewEvent(log, ev)
+						HandleViewEvent(log, mgr, ev)
 					}
 				}
 			case types.SIMCONNECT_RECV_ID_EVENT_FILENAME:

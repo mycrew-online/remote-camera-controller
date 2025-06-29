@@ -13,27 +13,34 @@ const DLL_DEFAULT_PATH = "C:/MSFS 2024 SDK/SimConnect SDK/lib/SimConnect.dll"
 
 // SimConnectManager handles the connection to the simulator.
 type SimConnectManager struct {
-	//system  *SimulatorState
-	state   ConnectionState
-	stateMu sync.RWMutex
-	stopCh  chan struct{}
-	stopped sync.WaitGroup
-	logger  *logger.Logger
-	client  *client.Engine
+	state    ConnectionState
+	stateMu  sync.RWMutex
+	stopCh   chan struct{}
+	stopped  sync.WaitGroup
+	logger   *logger.Logger
+	client   *client.Engine
+	simState *SimulatorState
 }
 
 // NewSimConnectManagerWithOptions creates a new SimConnectManager in Offline state.
 func NewSimConnectManagerWithOptions(logLevel string) *SimConnectManager {
 	level := parseLogLevel(logLevel)
 	fmt.Println("Log level set to:", level)
-	return &SimConnectManager{
+	log := logger.NewLogger(logger.LogOptions{
+		Level: level,
+	})
+	mgr := &SimConnectManager{
 		client: client.NewWithDLL(APP_NAME, DLL_DEFAULT_PATH),
-		logger: logger.NewLogger(logger.LogOptions{
-			Level: level,
-		}),
-		//system: &SimulatorState{},
-		state: Offline,
+		logger: log,
+		state:  Offline,
 	}
+	mgr.simState = NewSimulatorStateWithLogger(log)
+	return mgr
+}
+
+// SimulatorState returns the current simulator state store.
+func (m *SimConnectManager) SimulatorState() *SimulatorState {
+	return m.simState
 }
 
 // NewSimConnectManager is kept for backward compatibility, defaults to Info level.
