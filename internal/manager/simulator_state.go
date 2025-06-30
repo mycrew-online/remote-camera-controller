@@ -9,19 +9,16 @@ import (
 
 // SimulatorState holds the current tracked state from the simulator.
 type SimulatorState struct {
-	mu                    sync.RWMutex
-	AircraftLoaded        string
-	DialogMode            int
-	FlightLoaded          string
-	FlightPlan            string
-	Sim                   int
-	Pause                 int
-	Crashed               int
-	FlightPlanActivated   int
-	FlightPlanDeactivated int
-	PositionChanged       int
-	View                  int
-	logger                *logger.Logger
+	mu             sync.RWMutex
+	AircraftLoaded string
+	FlightLoaded   string
+	Sim            int
+	Pause          int
+	Crashed        int
+	View           int
+	logger         *logger.Logger
+
+	onStateChange func()
 }
 
 func NewSimulatorState() *SimulatorState {
@@ -40,25 +37,14 @@ func (s *SimulatorState) SetAircraftLoaded(val string) {
 		s.logger.Debug(fmt.Sprintf("[SimulatorState] AircraftLoaded set to %q", val))
 	}
 	s.mu.Unlock()
+	if s.onStateChange != nil {
+		s.onStateChange()
+	}
 }
 func (s *SimulatorState) GetAircraftLoaded() string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.AircraftLoaded
-}
-
-func (s *SimulatorState) SetDialogMode(val int) {
-	s.mu.Lock()
-	s.DialogMode = val
-	if s.logger != nil {
-		s.logger.Debug(fmt.Sprintf("[SimulatorState] DialogMode set to %d", val))
-	}
-	s.mu.Unlock()
-}
-func (s *SimulatorState) GetDialogMode() int {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.DialogMode
 }
 
 func (s *SimulatorState) SetFlightLoaded(val string) {
@@ -68,25 +54,14 @@ func (s *SimulatorState) SetFlightLoaded(val string) {
 		s.logger.Debug(fmt.Sprintf("[SimulatorState] FlightLoaded set to %q", val))
 	}
 	s.mu.Unlock()
+	if s.onStateChange != nil {
+		s.onStateChange()
+	}
 }
 func (s *SimulatorState) GetFlightLoaded() string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.FlightLoaded
-}
-
-func (s *SimulatorState) SetFlightPlan(val string) {
-	s.mu.Lock()
-	s.FlightPlan = val
-	if s.logger != nil {
-		s.logger.Debug(fmt.Sprintf("[SimulatorState] FlightPlan set to %q", val))
-	}
-	s.mu.Unlock()
-}
-func (s *SimulatorState) GetFlightPlan() string {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.FlightPlan
 }
 
 func (s *SimulatorState) SetSim(val int) {
@@ -96,6 +71,9 @@ func (s *SimulatorState) SetSim(val int) {
 		s.logger.Debug(fmt.Sprintf("[SimulatorState] Sim set to %d", val))
 	}
 	s.mu.Unlock()
+	if s.onStateChange != nil {
+		s.onStateChange()
+	}
 }
 func (s *SimulatorState) GetSim() int {
 	s.mu.RLock()
@@ -110,6 +88,9 @@ func (s *SimulatorState) SetPause(val int) {
 		s.logger.Debug(fmt.Sprintf("[SimulatorState] Pause set to %d", val))
 	}
 	s.mu.Unlock()
+	if s.onStateChange != nil {
+		s.onStateChange()
+	}
 }
 func (s *SimulatorState) GetPause() int {
 	s.mu.RLock()
@@ -124,53 +105,14 @@ func (s *SimulatorState) SetCrashed(val int) {
 		s.logger.Debug(fmt.Sprintf("[SimulatorState] Crashed set to %d", val))
 	}
 	s.mu.Unlock()
+	if s.onStateChange != nil {
+		s.onStateChange()
+	}
 }
 func (s *SimulatorState) GetCrashed() int {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.Crashed
-}
-
-func (s *SimulatorState) SetFlightPlanActivated(val int) {
-	s.mu.Lock()
-	s.FlightPlanActivated = val
-	if s.logger != nil {
-		s.logger.Debug(fmt.Sprintf("[SimulatorState] FlightPlanActivated set to %d", val))
-	}
-	s.mu.Unlock()
-}
-func (s *SimulatorState) GetFlightPlanActivated() int {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.FlightPlanActivated
-}
-
-func (s *SimulatorState) SetFlightPlanDeactivated(val int) {
-	s.mu.Lock()
-	s.FlightPlanDeactivated = val
-	if s.logger != nil {
-		s.logger.Debug(fmt.Sprintf("[SimulatorState] FlightPlanDeactivated set to %d", val))
-	}
-	s.mu.Unlock()
-}
-func (s *SimulatorState) GetFlightPlanDeactivated() int {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.FlightPlanDeactivated
-}
-
-func (s *SimulatorState) SetPositionChanged(val int) {
-	s.mu.Lock()
-	s.PositionChanged = val
-	if s.logger != nil {
-		s.logger.Debug(fmt.Sprintf("[SimulatorState] PositionChanged set to %d", val))
-	}
-	s.mu.Unlock()
-}
-func (s *SimulatorState) GetPositionChanged() int {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.PositionChanged
 }
 
 func (s *SimulatorState) SetView(val int) {
@@ -180,9 +122,16 @@ func (s *SimulatorState) SetView(val int) {
 		s.logger.Debug(fmt.Sprintf("[SimulatorState] View set to %d", val))
 	}
 	s.mu.Unlock()
+	if s.onStateChange != nil {
+		s.onStateChange()
+	}
 }
 func (s *SimulatorState) GetView() int {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.View
+}
+
+func (s *SimulatorState) SetOnStateChange(cb func()) {
+	s.onStateChange = cb
 }

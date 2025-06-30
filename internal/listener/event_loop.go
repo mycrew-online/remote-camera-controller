@@ -52,9 +52,9 @@ func StartSimConnectEventListener(mgr *manager.SimConnectManager, log *logger.Lo
 				if ev, ok := event.Data.(*types.SIMCONNECT_RECV_EVENT_FILENAME); ok {
 					switch ev.UEventID {
 					case 101:
-						HandleAircraftLoadedFilenameEvent(log, ev)
+						HandleAircraftLoadedFilenameEvent(log, mgr, ev)
 					case 102:
-						HandleFlightLoadedFilenameEvent(log, ev)
+						HandleFlightLoadedFilenameEvent(log, mgr, ev)
 					}
 				}
 			case types.SIMCONNECT_RECV_ID_QUIT:

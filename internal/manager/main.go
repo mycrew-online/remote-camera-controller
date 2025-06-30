@@ -37,6 +37,12 @@ func NewSimConnectManagerWithOptions(logLevel string) *SimConnectManager {
 		state:  Offline,
 	}
 	mgr.simState = NewSimulatorStateWithLogger(log)
+	// Wire simulator state's onStateChange to manager's onStateChange
+	mgr.simState.SetOnStateChange(func() {
+		if mgr.onStateChange != nil {
+			mgr.onStateChange()
+		}
+	})
 	return mgr
 }
 
