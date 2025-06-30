@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -12,16 +13,22 @@ import (
 
 // Server wraps the Gin engine.
 type Server struct {
-	engine *gin.Engine
-	mgr    *manager.SimConnectManager
+	engine  *gin.Engine
+	mgr     *manager.SimConnectManager
+	clients map[*websocket.Conn]struct{}
+	mu      sync.Mutex
 }
 
 // New creates a new Server instance serving static files from the given directory and manager.
 func New(staticDir string, mgr *manager.SimConnectManager) *Server {
-	r := gin.Default()
+	s := &Server{
+		engine:  gin.Default(),
+		mgr:     mgr,
+		clients: make(map[*websocket.Conn]struct{}),
+	}
 
 	// WebSocket endpoint (register first)
-	r.GET("/ws", func(c *gin.Context) {
+	s.engine.GET("/ws", func(c *gin.Context) {
 		var upgrader = websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool { return true },
 		}
@@ -30,28 +37,12 @@ func New(staticDir string, mgr *manager.SimConnectManager) *Server {
 			log.Println("WebSocket upgrade error:", err)
 			return
 		}
+		s.registerClient(conn)
+		defer s.unregisterClient(conn)
 		defer conn.Close()
 
 		// Send current state as JSON
-		type StatePayload struct {
-			ConnectionState string      `json:"connectionState"`
-			SimulatorState  interface{} `json:"simulatorState"`
-		}
-		state := StatePayload{
-			ConnectionState: "Unknown",
-			SimulatorState:  nil,
-		}
-		if mgr != nil {
-			if mgr.IsOnline() {
-				state.ConnectionState = "Online"
-			} else {
-				state.ConnectionState = "Offline"
-			}
-			state.SimulatorState = mgr.SimulatorState()
-		}
-		if data, err := json.Marshal(state); err == nil {
-			conn.WriteMessage(websocket.TextMessage, data)
-		}
+		s.sendState(conn)
 
 		// Log messages from client
 		for {
@@ -65,14 +56,57 @@ func New(staticDir string, mgr *manager.SimConnectManager) *Server {
 	})
 
 	// Serve static files (SPA) from /build, but only for files, not as a catch-all
-	r.StaticFS("/_app", http.Dir(staticDir+"/build/_app"))
+	s.engine.StaticFS("/_app", http.Dir(staticDir+"/build/_app"))
 
 	// Fallback to index.html for SPA routes
-	r.NoRoute(func(c *gin.Context) {
+	s.engine.NoRoute(func(c *gin.Context) {
 		c.File(staticDir + "/build/index.html")
 	})
 
-	return &Server{engine: r, mgr: mgr}
+	return s
+}
+
+func (s *Server) registerClient(conn *websocket.Conn) {
+	s.mu.Lock()
+	s.clients[conn] = struct{}{}
+	s.mu.Unlock()
+}
+
+func (s *Server) unregisterClient(conn *websocket.Conn) {
+	s.mu.Lock()
+	delete(s.clients, conn)
+	s.mu.Unlock()
+}
+
+func (s *Server) sendState(conn *websocket.Conn) {
+	type StatePayload struct {
+		ConnectionState string      `json:"connectionState"`
+		SimulatorState  interface{} `json:"simulatorState"`
+	}
+	state := StatePayload{
+		ConnectionState: "Unknown",
+		SimulatorState:  nil,
+	}
+	if s.mgr != nil {
+		if s.mgr.IsOnline() {
+			state.ConnectionState = "Online"
+		} else {
+			state.ConnectionState = "Offline"
+		}
+		state.SimulatorState = s.mgr.SimulatorState()
+	}
+	if data, err := json.Marshal(state); err == nil {
+		conn.WriteMessage(websocket.TextMessage, data)
+	}
+}
+
+// BroadcastState sends the current state to all connected clients.
+func (s *Server) BroadcastState() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for conn := range s.clients {
+		s.sendState(conn)
+	}
 }
 
 // Run starts the HTTP server on the given address.

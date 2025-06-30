@@ -15,10 +15,12 @@ type Application struct {
 func NewApplicationWithOptions(logLevel string) *Application {
 	mgr := manager.NewSimConnectManagerWithOptions(logLevel)
 	srv := server.New("website", mgr)
-	return &Application{
+	app := &Application{
 		SimConnectManager: mgr,
 		Server:            srv,
 	}
+	mgr.SetOnStateChange(srv.BroadcastState)
+	return app
 }
 
 // NewApplication is kept for backward compatibility, defaults to info log level.

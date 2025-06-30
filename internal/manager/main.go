@@ -20,6 +20,8 @@ type SimConnectManager struct {
 	logger   *logger.Logger
 	client   *client.Engine
 	simState *SimulatorState
+
+	onStateChange func()
 }
 
 // NewSimConnectManagerWithOptions creates a new SimConnectManager in Offline state.
@@ -86,4 +88,22 @@ func (m *SimConnectManager) SetOffline() {
 	m.stateMu.Lock()
 	m.state = Offline
 	m.stateMu.Unlock()
+	if m.onStateChange != nil {
+		m.onStateChange()
+	}
+}
+
+// SetOnline sets the manager state to Online in a thread-safe way.
+func (m *SimConnectManager) SetOnline() {
+	m.stateMu.Lock()
+	m.state = Online
+	m.stateMu.Unlock()
+	if m.onStateChange != nil {
+		m.onStateChange()
+	}
+}
+
+// SetOnStateChange sets the callback for state changes.
+func (m *SimConnectManager) SetOnStateChange(cb func()) {
+	m.onStateChange = cb
 }
