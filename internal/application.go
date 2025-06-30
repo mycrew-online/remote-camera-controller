@@ -1,17 +1,23 @@
 package internal
 
-import "github.com/mycrew-online/remote-camera-controller/internal/manager"
+import (
+	"github.com/mycrew-online/remote-camera-controller/internal/manager"
+	"github.com/mycrew-online/remote-camera-controller/internal/server"
+)
 
 type Application struct {
-	// SimConnectManager handles the connection to the simulator.
 	SimConnectManager *manager.SimConnectManager
+	Server            *server.Server
 	System            *SimulatorState
 }
 
 // NewApplicationWithOptions creates an Application with a log level option.
 func NewApplicationWithOptions(logLevel string) *Application {
+	mgr := manager.NewSimConnectManagerWithOptions(logLevel)
+	srv := server.New("website", mgr)
 	return &Application{
-		SimConnectManager: manager.NewSimConnectManagerWithOptions(logLevel),
+		SimConnectManager: mgr,
+		Server:            srv,
 	}
 }
 

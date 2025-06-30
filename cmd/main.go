@@ -17,6 +17,14 @@ func main() {
 
 	// Create a new application instance with log level option.
 	app := internal.NewApplicationWithOptions(logLevel)
+
+	// Start the web server for SPA
+	go func() {
+		if err := app.Server.Run(":8080"); err != nil {
+			panic(err)
+		}
+	}()
+
 	// Bootstrap the application, which initializes the SimConnectManager
 	// and starts the main connection loop.
 	app.Bootstrap()
