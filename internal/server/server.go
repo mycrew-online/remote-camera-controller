@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -20,12 +21,18 @@ type Server struct {
 }
 
 // New creates a new Server instance serving static files from the given directory and manager.
+
 func New(staticDir string, mgr *manager.SimConnectManager) *Server {
 	s := &Server{
-		engine:  gin.Default(),
+		engine:  gin.New(),
 		mgr:     mgr,
 		clients: make(map[*websocket.Conn]struct{}),
 	}
+
+	s.engine.Use(gin.Recovery()) // Use Gin's recovery middleware
+
+	// Register centralized logger middleware
+	s.engine.Use(GinLoggerMiddleware(mgr))
 
 	// WebSocket endpoint (register first)
 	s.engine.GET("/ws", func(c *gin.Context) {
@@ -38,8 +45,12 @@ func New(staticDir string, mgr *manager.SimConnectManager) *Server {
 			return
 		}
 		s.registerClient(conn)
-		defer s.unregisterClient(conn)
-		defer conn.Close()
+		s.mgr.Logger().Debug("[WebSocketClient] connected")
+		defer func() {
+			s.unregisterClient(conn)
+			conn.Close()
+			s.mgr.Logger().Debug("[WebSocketClient] disconnected")
+		}()
 
 		// Send current state as JSON
 		s.sendState(conn)
@@ -48,7 +59,7 @@ func New(staticDir string, mgr *manager.SimConnectManager) *Server {
 		for {
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
-				log.Println("WebSocket read error:", err)
+				s.mgr.Logger().Debug(fmt.Sprintf("[WebSocketClient] read error: %v", err))
 				break
 			}
 			log.Printf("Received from client: %s\n", msg)

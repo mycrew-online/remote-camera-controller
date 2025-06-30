@@ -3,10 +3,12 @@ package main
 import (
 	"flag"
 
+	"github.com/gin-gonic/gin"
 	"github.com/mycrew-online/remote-camera-controller/internal"
 )
 
 func main() {
+	gin.SetMode(gin.ReleaseMode)
 	verbose := flag.Bool("verbose", false, "Enable debug logging")
 	flag.Parse()
 

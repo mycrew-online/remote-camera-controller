@@ -1,7 +1,6 @@
 package manager
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/mrlm-net/go-logz/pkg/logger"
@@ -27,7 +26,6 @@ type SimConnectManager struct {
 // NewSimConnectManagerWithOptions creates a new SimConnectManager in Offline state.
 func NewSimConnectManagerWithOptions(logLevel string) *SimConnectManager {
 	level := parseLogLevel(logLevel)
-	fmt.Println("Log level set to:", level)
 	log := logger.NewLogger(logger.LogOptions{
 		Level: level,
 	})
